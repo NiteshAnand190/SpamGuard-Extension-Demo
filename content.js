@@ -3,9 +3,6 @@ const API_URL = "https://spam-guard-api.onrender.com";
 
 function isContextValid() {
     try {
-        // chrome.runtime.id becomes undefined when the extension
-        // context is invalidated. This is the official Chrome way
-        // to detect a dead context from a content script.
         return !!(chrome && chrome.runtime && chrome.runtime.id);
     } catch (e) {
         return false;
