@@ -1,0 +1,154 @@
+/* Container for the Widget */
+#spam-guard-overlay {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 320px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  border: 1px solid #eee;
+  border-radius: 12px;
+  z-index: 99999;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: width 0.3s ease, height 0.3s ease, border-radius 0.3s ease;
+  overflow: hidden;
+  font-size: 14px;
+  color: #333;
+  user-select: none;
+}
+
+/* =========================================
+   STATE 1: EXPANDED (Default)
+   ========================================= */
+#sg-minimized-icon {
+  display: none;
+}
+
+#sg-expanded-view {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================================
+   STATE 2: MINIMIZED (Class Added)
+   ========================================= */
+#spam-guard-overlay.minimized {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: white;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #007bff;
+  cursor: move;
+}
+
+#spam-guard-overlay.minimized #sg-minimized-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#spam-guard-overlay.minimized #sg-expanded-view {
+  display: none;
+}
+
+/* =========================================
+   REST OF STYLES
+   ========================================= */
+.sg-header {
+  background: #f8f9fa;
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  color: #444;
+  cursor: move;
+}
+
+.sg-header span { cursor: pointer; }
+.sg-header:hover { background: #f1f1f1; }
+
+.sg-power-btn {
+  font-size: 12px;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-right: 10px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.sg-power-btn:hover { background: #dc3545; color: white; }
+
+.sg-content { padding: 15px; cursor: default; }
+
+.sg-verdict {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sg-bar-bg {
+  height: 6px;
+  background: #eee;
+  border-radius: 3px;
+  margin: 8px 0 12px 0;
+  overflow: hidden;
+}
+
+.sg-bar-fill {
+  height: 100%;
+  background: #ccc;
+  width: 0%;
+  transition: width 0.5s;
+}
+
+.sg-explanation {
+  background: #f1f8ff;
+  border-left: 4px solid #007bff;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #555;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Rescan Button */
+.sg-rescan-btn {
+  margin-top: 10px;
+  width: 100%;
+  padding: 7px 0;
+  background: transparent;
+  border: 1px solid #007bff;
+  color: #007bff;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sg-rescan-btn:hover {
+  background: #007bff;
+  color: white;
+}
+
+.text-red { color: #dc3545; }
+.text-green { color: #28a745; }
+.text-orange { color: #fd7e14; }
+.text-gray { color: #6c757d; }
+.bg-red { background: #dc3545; }
+.bg-green { background: #28a745; }
+.bg-orange { background: #fd7e14; }
+.bg-gray { background: #6c757d; }
