@@ -1,33 +1,6 @@
-// ========================================================
 // CONFIGURATION
-// ========================================================
 const API_URL = "https://spam-guard-api.onrender.com";
 
-// ========================================================
-// EXTENSION CONTEXT GUARD
-//
-// ROOT CAUSE OF THE ERROR:
-//   "Cannot read properties of undefined (reading 'local')"
-//   means chrome.storage is undefined — NOT chrome itself.
-//
-// WHY THIS HAPPENS:
-//   When you reload/update the extension from chrome://extensions
-//   while Gmail is already open, Chrome partially invalidates the
-//   old content script's context. chrome.runtime still exists
-//   (so chrome.runtime.getURL works fine at the top) but
-//   chrome.storage gets torn down. Any call to chrome.storage.local
-//   after that throws this exact error.
-//
-// THE FIX:
-//   1. isContextValid() — checks chrome.runtime.id, which becomes
-//      undefined the moment the context is invalidated. We call this
-//      before EVERY chrome API call.
-//   2. All chrome.storage calls are wrapped in try/catch so that
-//      even if the guard misses an edge case, the error is caught
-//      silently instead of crashing the whole script.
-//   3. The MutationObserver callback re-validates on every URL
-//      change — the most frequent trigger point.
-// ========================================================
 function isContextValid() {
     try {
         // chrome.runtime.id becomes undefined when the extension
@@ -39,8 +12,6 @@ function isContextValid() {
     }
 }
 
-// Safe wrapper for chrome.storage.local.get
-// Falls back to defaultValue if context is dead
 function safeStorageGet(key, callback, defaultValue = {}) {
     if (!isContextValid()) {
         callback(defaultValue);
@@ -48,7 +19,6 @@ function safeStorageGet(key, callback, defaultValue = {}) {
     }
     try {
         chrome.storage.local.get(key, (data) => {
-            // chrome.runtime.lastError must be checked inside the callback
             if (chrome.runtime.lastError) {
                 console.warn("SpamGuard: storage.get error —", chrome.runtime.lastError.message);
                 callback(defaultValue);
@@ -62,7 +32,6 @@ function safeStorageGet(key, callback, defaultValue = {}) {
     }
 }
 
-// Safe wrapper for chrome.storage.local.set
 function safeStorageSet(obj) {
     if (!isContextValid()) return;
     try {
@@ -72,16 +41,10 @@ function safeStorageSet(obj) {
     }
 }
 
-// ========================================================
 // GET LOGO URL
-// (chrome.runtime.getURL is safe here — called once at
-//  top-level before any async context invalidation can happen)
-// ========================================================
 const logoUrl = chrome.runtime.getURL("logo.png");
 
-// ========================================================
 // UI CREATION
-// ========================================================
 const overlay = document.createElement("div");
 overlay.id = "spam-guard-overlay";
 overlay.className = "minimized";
@@ -113,9 +76,7 @@ overlay.innerHTML = `
 `;
 document.body.appendChild(overlay);
 
-// ========================================================
 // DRAG & DROP LOGIC
-// ========================================================
 let isDragging = false;
 let hasMoved = false;
 let dragOffset = { x: 0, y: 0 };
@@ -174,9 +135,7 @@ function stopDrag() {
 header.addEventListener('mousedown', startDrag);
 minIcon.addEventListener('mousedown', startDrag);
 
-// ========================================================
 // SMART BOUNDARY CHECK
-// ========================================================
 function adjustPosition() {
     if (overlay.style.left && overlay.style.left !== "auto") {
         const winW = window.innerWidth;
@@ -198,9 +157,7 @@ function adjustPosition() {
     }
 }
 
-// ========================================================
 // UI STATE LOGIC
-// ========================================================
 
 minIcon.addEventListener("click", (e) => {
     if (!hasMoved) {
@@ -233,7 +190,6 @@ safeStorageGet("isActive", (data) => {
     if (data.isActive === false) overlay.style.display = "none";
 });
 
-// Toggle message from toolbar popup — guarded
 if (isContextValid()) {
     try {
         chrome.runtime.onMessage.addListener((request) => {
@@ -246,29 +202,18 @@ if (isContextValid()) {
     }
 }
 
-// ========================================================
 // EMAIL DETECTION
-// Gmail thread IDs are always 10+ char alphanumeric strings
-// at the end of the URL hash. Covers inbox, spam, search,
-// sent, starred, labels — every Gmail view.
-// ========================================================
 function isEmailCurrentlyOpen() {
     return /\/[a-zA-Z0-9]{10,}$/.test(location.hash);
 }
 
-// ========================================================
 // CORE LOGIC: DETECT EMAIL & SCAN
-// ========================================================
 let lastUrl = location.href;
 
 new MutationObserver(() => {
     if (location.href === lastUrl) return;
     lastUrl = location.href;
 
-    // Re-check context validity on every navigation.
-    // If the extension was reloaded mid-session this will be
-    // false and we skip the chrome.storage call entirely,
-    // preventing the TypeError.
     if (!isContextValid()) {
         updateUI("⚠️ Extension Reloaded", "orange", 0, "Please reload this Gmail tab to re-activate SpamGuard.");
         return;
@@ -285,9 +230,7 @@ new MutationObserver(() => {
     });
 }).observe(document, { subtree: true, childList: true });
 
-// ========================================================
 // RETRY LOGIC
-// ========================================================
 function scanEmailWithRetry(attempt = 1, maxAttempts = 6) {
     const emailBodyNode = document.querySelector('.a3s');
 
