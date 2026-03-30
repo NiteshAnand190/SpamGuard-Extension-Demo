@@ -20,9 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Tell the Content Script (Gmail) to hide/show immediately
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0]?.id) {
-          // FIX IS HERE: We add a callback function to handle the error
           chrome.tabs.sendMessage(tabs[0].id, { action: "TOGGLE_WIDGET", state: newState }, (response) => {
-            // If the content script isn't there (e.g. non-Gmail tab), ignore the error silently
             if (chrome.runtime.lastError) {
               console.log("Widget not active on this tab (ignoring).");
             }
