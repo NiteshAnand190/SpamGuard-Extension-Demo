@@ -1,4 +1,3 @@
-/* Container for the Widget */
 #spam-guard-overlay {
   position: fixed;
   bottom: 30px;
@@ -18,9 +17,6 @@
   user-select: none;
 }
 
-/* =========================================
-   STATE 1: EXPANDED (Default)
-   ========================================= */
 #sg-minimized-icon {
   display: none;
 }
@@ -31,9 +27,6 @@
   height: 100%;
 }
 
-/* =========================================
-   STATE 2: MINIMIZED (Class Added)
-   ========================================= */
 #spam-guard-overlay.minimized {
   width: 60px;
   height: 60px;
@@ -57,9 +50,6 @@
   display: none;
 }
 
-/* =========================================
-   REST OF STYLES
-   ========================================= */
 .sg-header {
   background: #f8f9fa;
   padding: 12px 15px;
@@ -125,7 +115,6 @@
   overflow-y: auto;
 }
 
-/* Rescan Button */
 .sg-rescan-btn {
   margin-top: 10px;
   width: 100%;
